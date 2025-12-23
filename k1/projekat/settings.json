@@ -1,0 +1,37 @@
+{
+    "DHT1": {
+        "simulated": false,
+        "pin": 17
+    },
+    "DUS1": {
+        "simulated": false,
+        "trigger_pin": 23,
+        "echo_pin": 24,
+        "threshold_cm": 15,
+        "delay": 1
+    },
+    "DPIR1": {
+        "simulated": false,
+        "pin": 25,
+        "delay": 1
+    },
+    "DMS1": {
+        "simulated": false,
+        "pin": 16,
+        "delay": 0.2
+    },
+    "DS1": {
+        "simulated": false,
+        "pin": 21,
+        "delay": 0.1
+    },
+    "DB1": {
+        "simulated": false,
+        "pin": 18
+    },
+    "DL1": {
+        "simulated": false,
+        "pin": 12,
+        "active_high": true
+    }
+}
