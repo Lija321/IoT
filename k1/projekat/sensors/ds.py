@@ -1,7 +1,33 @@
 import time
 
-import RPi.GPIO as GPIO
 
+try:
+	import RPi.GPIO as GPIO
+except ImportError:	
+	class GPIOStub:
+		BCM = None
+		OUT = None
+		IN = None
+		LOW = 0
+		HIGH = 1
+
+		@staticmethod
+		def setmode(mode):
+			pass
+
+		@staticmethod
+		def setup(pin, mode):
+			pass
+
+		@staticmethod
+		def output(pin, state):
+			pass
+
+		@staticmethod
+		def input(pin):
+			return GPIOStub.LOW
+
+	GPIO = GPIOStub()
 
 class DoorButton:
     def __init__(self, pin):

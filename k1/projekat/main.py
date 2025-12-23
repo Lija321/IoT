@@ -3,7 +3,6 @@ import threading
 import time
 
 from settings import load_settings
-from components.dht import run_dht
 from components.dus import run_dus
 from components.dpir import run_dpir
 from components.dms import run_dms
