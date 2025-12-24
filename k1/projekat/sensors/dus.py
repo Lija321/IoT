@@ -57,7 +57,7 @@ class UltrasonicSensor:
         pulse_end = time.time()
 
         pulse_duration = pulse_end - pulse_start
-        # Speed of sound in air is ~34300 cm/s
+        
         distance = pulse_duration * 17150
         return distance
 

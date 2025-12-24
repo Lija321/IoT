@@ -2,12 +2,19 @@ import random
 import time
 
 
-def run_dms_simulator(delay, callback, stop_event):
-    pressed = False
+def run_dms_simulator(delay, keymap, callback, stop_event, allow_multi=True):
+    keys = [k for row in keymap for k in row]
+    pressed = set()
     while True:
-        # Randomly toggle pressed state to mimic door open/close
-        if random.random() < 0.3:
-            pressed = not pressed
+        # Occasionally change the pressed set to mimic key activity
+        if random.random() < 0.25:
+            if pressed:
+                pressed = set()
+            else:
+                if allow_multi and len(keys) > 1 and random.random() < 0.2:
+                    pressed = set(random.sample(keys, 2))
+                else:
+                    pressed = {random.choice(keys)}
         callback(pressed)
         if stop_event.is_set():
             break

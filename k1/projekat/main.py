@@ -22,9 +22,6 @@ def run_sensor_mode(settings):
     threads = []
     stop_event = threading.Event()
     try:
-        if "DHT1" in settings:
-            dht1_settings = settings["DHT1"]
-            run_dht(dht1_settings, threads, stop_event)
         if "DUS1" in settings:
             dus1_settings = settings["DUS1"]
             run_dus(dus1_settings, threads, stop_event)

@@ -4,34 +4,49 @@ import time
 from simulators.dms import run_dms_simulator
 
 
-def dms_callback(pressed):
+DEFAULT_KEYMAP = [
+    ["1", "2", "3", "A"],
+    ["4", "5", "6", "B"],
+    ["7", "8", "9", "C"],
+    ["*", "0", "#", "D"],
+]
+
+
+def dms_callback(pressed_keys):
     t = time.localtime()
     print("=" * 20)
     print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-    state = "CLOSED" if pressed else "OPEN"
-    print(f"Door Switch: {state}")
+    if pressed_keys:
+        print(f"Keys pressed: {', '.join(sorted(pressed_keys))}")
+    else:
+        print("Keys pressed: none")
 
 
 def run_dms(settings, threads, stop_event):
     delay = settings.get("delay", 0.2)
+    keymap = settings.get("keymap", DEFAULT_KEYMAP)
+    row_pins = settings.get("row_pins", settings.get("rows", [25, 8, 7, 1]))
+    col_pins = settings.get("col_pins", settings.get("cols", [12, 16, 20, 21]))
+    allow_multi = settings.get("allow_multi", True)
+
     if settings["simulated"]:
-        print("Starting dms1 simulator")
+        print("Starting keypad simulator")
         dms_thread = threading.Thread(
             target=run_dms_simulator,
-            args=(delay, dms_callback, stop_event),
+            args=(delay, keymap, dms_callback, stop_event, allow_multi),
         )
         dms_thread.start()
         threads.append(dms_thread)
-        print("Dms1 simulator started")
+        print("Keypad simulator started")
     else:
-        from sensors.dms import MembraneSwitch, run_dms_loop
+        from sensors.dms import MembraneKeypad, run_dms_loop
 
-        print("Starting dms1 loop")
-        sensor = MembraneSwitch(settings["pin"])
+        print("Starting keypad loop")
+        keypad = MembraneKeypad(row_pins, col_pins, keymap, allow_multi=allow_multi)
         dms_thread = threading.Thread(
             target=run_dms_loop,
-            args=(sensor, delay, dms_callback, stop_event),
+            args=(keypad, delay, dms_callback, stop_event),
         )
         dms_thread.start()
         threads.append(dms_thread)
-        print("Dms1 loop started")
+        print("Keypad loop started")
