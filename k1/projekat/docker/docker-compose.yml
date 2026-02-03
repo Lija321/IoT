@@ -1,0 +1,82 @@
+# KT2: MQTT broker, InfluxDB 2, Grafana
+# Pokretanje: cd docker && docker compose up -d
+# Zaustavljanje: docker compose down
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: kt2-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/broker/uptime", "-C", "1", "-W", "3"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: kt2-influxdb
+    ports:
+      - "8086:8086"
+    env_file: .env
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_ADMIN_PASSWORD:-admin1234}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG:-iot}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET:-iot}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_ADMIN_TOKEN:-kt2-influxdb-token}
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8086/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kt2-grafana
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_HTTP_PORT: 3000
+      # Timezone: Srbija (Europe/Belgrade)
+      GF_USERS_DEFAULT_TIMEZONE: Europe/Belgrade
+      GF_DATASOURCES_DEFAULT_NAME: InfluxDB
+      GF_DATASOURCES_DEFAULT_TYPE: influxdb
+      GF_DATASOURCES_DEFAULT_UID: influxdb
+      GF_DATASOURCES_DEFAULT_URL: http://influxdb:8086
+      GF_DATASOURCES_DEFAULT_ACCESS: proxy
+      GF_DATASOURCES_DEFAULT_JSON_DATA_VERSION: Flux
+      GF_DATASOURCES_DEFAULT_JSON_DATA_ORG: ${INFLUX_ORG:-iot}
+      GF_DATASOURCES_DEFAULT_SECURE_JSON_DATA_TOKEN: ${INFLUX_ADMIN_TOKEN:-kt2-influxdb-token}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../grafana:/var/lib/grafana/dashboards-import:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    restart: unless-stopped
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  influxdb-data:
+  grafana-data:

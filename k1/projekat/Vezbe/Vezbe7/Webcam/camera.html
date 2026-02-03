@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>9 Camera Grid</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #111;
+    color: #fff;
+  }
+
+  .controls {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: #1c1c1c;
+  }
+
+  .controls input {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: calc(100vh - 110px);
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .cam {
+    background: #000;
+    position: relative;
+  }
+
+  .cam img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+</head>
+<body>
+
+<div class="controls" id="controls"></div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const defaultUrls = [
+  "http://192.168.107.141:8080/?action=stream",
+  "http://192.168.107.142:8080/?action=stream",
+  "http://192.168.107.143:8080/?action=stream",
+  "http://192.168.107.144:8080/?action=stream",
+  "http://192.168.107.145:8080/?action=stream",
+  "http://192.168.107.146:8080/?action=stream",
+  "http://192.168.107.147:8080/?action=stream",
+  "http://192.168.107.148:8080/?action=stream",
+  "http://192.168.107.149:8080/?action=stream"
+];
+
+const controls = document.getElementById("controls");
+const grid = document.getElementById("grid");
+
+defaultUrls.forEach((url, i) => {
+  const input = document.createElement("input");
+  input.placeholder = `Camera ${i + 1} URL`;
+  input.value = url;
+  input.onchange = () => updateCamera(i, input.value);
+  controls.appendChild(input);
+
+  const cam = document.createElement("div");
+  cam.className = "cam";
+  cam.innerHTML = `<img id="cam-${i}" src="${url}" />`;
+  grid.appendChild(cam);
+});
+
+function updateCamera(index, url) {
+  const img = document.getElementById(`cam-${index}`);
+  img.src = url;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+# KT1 – osnova
+# (RPi.GPIO na uređaju, nije u PyPI za sve platforme)
+
+# KT2 – MQTT i server
+paho-mqtt>=2.0.0
+flask>=3.0.0
+influxdb-client>=1.38.0

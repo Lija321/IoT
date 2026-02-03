@@ -1,14 +1,17 @@
 import argparse
+import queue
 import threading
 import time
 
-from settings import load_settings
+from settings import load_settings, get_device_info, get_mqtt_config
 from components.dus import run_dus
 from components.dpir import run_dpir
 from components.dms import run_dms
 from components.ds import run_ds
 from components.db import build_buzzer
 from components.dl import build_door_light
+from mqtt_batch import start_batch_daemon, make_enqueue
+from actuator_mqtt import start_actuator_mqtt, publish_state, get_actuator_state_topic_prefix
 
 try:
     import RPi.GPIO as GPIO
@@ -21,25 +24,38 @@ except:  # pragma: no cover - GPIO not available in simulations
 def run_sensor_mode(settings):
     threads = []
     stop_event = threading.Event()
+    reading_queue = queue.Queue()
+    device_info = get_device_info(settings)
+    mqtt_cfg = get_mqtt_config(settings)
+    topic_prefix = mqtt_cfg.get("topic_prefix", "iot/sensors")
+    enqueue = make_enqueue(reading_queue)
+    start_batch_daemon(settings, reading_queue, stop_event)
     try:
         if "DUS1" in settings:
-            dus1_settings = settings["DUS1"]
-            run_dus(dus1_settings, threads, stop_event)
+            run_dus(
+                settings["DUS1"], threads, stop_event,
+                enqueue_reading=enqueue, device_info=device_info, topic_prefix=topic_prefix,
+            )
         if "DPIR1" in settings:
-            dpir1_settings = settings["DPIR1"]
-            run_dpir(dpir1_settings, threads, stop_event)
+            run_dpir(
+                settings["DPIR1"], threads, stop_event,
+                enqueue_reading=enqueue, device_info=device_info, topic_prefix=topic_prefix,
+            )
         if "DMS1" in settings:
-            dms1_settings = settings["DMS1"]
-            run_dms(dms1_settings, threads, stop_event)
+            run_dms(
+                settings["DMS1"], threads, stop_event,
+                enqueue_reading=enqueue, device_info=device_info, topic_prefix=topic_prefix,
+            )
         if "DS1" in settings:
-            ds1_settings = settings["DS1"]
-            run_ds(ds1_settings, threads, stop_event)
+            run_ds(
+                settings["DS1"], threads, stop_event,
+                enqueue_reading=enqueue, device_info=device_info, topic_prefix=topic_prefix,
+            )
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         print("Stopping sensors")
-        for t in threads:
-            stop_event.set()
+        stop_event.set()
 
 
 def run_actuator_cli(settings):
@@ -54,6 +70,10 @@ def run_actuator_cli(settings):
     if not controllers:
         print("No actuators configured (missing DB1/DL1 in settings). Exiting actuator CLI.")
         return
+
+    _, _stop, client_holder = start_actuator_mqtt(settings, controllers)
+    device_info = get_device_info(settings)
+    topic_prefix_state = get_actuator_state_topic_prefix(settings)
 
     def handle_command(cmd, target=None):
         if cmd == "status":
@@ -88,6 +108,9 @@ def run_actuator_cli(settings):
             print("Commands: on/off/toggle [target], status [target], exit")
             return
         print(f"{target.capitalize()} {controller.status()}")
+        client = client_holder[0] if client_holder else None
+        if client:
+            publish_state(client, device_info, topic_prefix_state, target, controller.status())
 
     try:
         while True:
@@ -101,6 +124,8 @@ def run_actuator_cli(settings):
             handle_command(cmd, target)
     except KeyboardInterrupt:
         print("\nExiting actuator CLI")
+    if _stop:
+        _stop.set()
 
 
 if __name__ == "__main__":

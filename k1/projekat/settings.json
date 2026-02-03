@@ -1,15 +1,30 @@
 {
+    "device": {
+        "pi_id": "PI1",
+        "device_name": "Raspberry_PI_1",
+        "location": "Lab",
+        "room": "101"
+    },
+    "mqtt": {
+        "broker_host": "localhost",
+        "broker_port": 1883,
+        "topic_prefix": "iot/pi1/sensors"
+    },
+    "batch": {
+        "batch_size": 10,
+        "flush_interval_sec": 5
+    },
     "DUS1": {
         "simulated": true,
         "trigger_pin": 23,
         "echo_pin": 24,
         "threshold_cm": 15,
-        "delay": 1
+        "delay": 3
     },
     "DPIR1": {
         "simulated": true,
         "pin": 25,
-        "delay": 1
+        "delay": 3
     },
     "DMS1": {
         "simulated": true,
@@ -21,13 +36,13 @@
             ["7", "8", "9", "C"],
             ["*", "0", "#", "D"]
         ],
-        "delay": 0.2,
+        "delay": 0.5,
         "allow_multi": true
     },
     "DS1": {
         "simulated": true,
         "pin": 21,
-        "delay": 0.1
+        "delay": 0.5
     },
     "DB1": {
         "simulated": true,

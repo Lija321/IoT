@@ -1,0 +1,282 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisLabel": "", "axisPlacement": "auto" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }] },
+          "unit": "lengthcm"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dus\")\n  |> filter(fn: (r) => r[\"_field\"] == \"distance_cm\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DUS – udaljenost (cm)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [{ "options": { "0": { "color": "green", "index": 0, "text": "Zatvoreno" } }, "type": "value" }, { "options": { "1": { "color": "blue", "index": 0, "text": "Otvoreno" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dus\")\n  |> filter(fn: (r) => r[\"_field\"] == \"is_open\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DUS – stanje vrata (otvoreno/zatvoreno)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [{ "options": { "0": { "color": "green", "index": 0, "text": "Nema pokreta" } }, "type": "value" }, { "options": { "1": { "color": "orange", "index": 0, "text": "Pokret" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dpir\")\n  |> filter(fn: (r) => r[\"_field\"] == \"motion\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DPIR – PIR senzor pokreta",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineInterpolation": "stepAfter" },
+          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 4,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dms\")\n  |> filter(fn: (r) => r[\"_field\"] == \"keys_count\")\n  |> yield(name: \"keys_count\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DMS – broj pritisnutih tipki",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "#808080", "index": 0, "text": "0 (nijedna)" } }, "type": "value" },
+            { "options": { "1": { "color": "#73BF69", "index": 0, "text": "1 tipka" } }, "type": "value" },
+            { "options": { "2": { "color": "#FADE2A", "index": 0, "text": "2 tipke" } }, "type": "value" },
+            { "options": { "3": { "color": "#F2495C", "index": 0, "text": "3 tipke" } }, "type": "value" },
+            { "options": { "4": { "color": "#5794F2", "index": 0, "text": "4+ tipki" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "#808080", "value": null }, { "color": "#73BF69", "value": 1 }, { "color": "#FADE2A", "value": 2 }, { "color": "#F2495C", "value": 3 }, { "color": "#5794F2", "value": 4 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "id": 7,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dms\")\n  |> filter(fn: (r) => r[\"_field\"] == \"keys_count\")\n  |> yield(name: \"keys_count\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DMS – broj pritisnutih tipki (timeline)",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "text" },
+          "mappings": [
+            { "options": { "": { "color": "#808080", "index": 0, "text": "— nijedna" } }, "type": "value" },
+            { "options": { "null": { "color": "#808080", "index": 0, "text": "— nijedna" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "text", "value": null }] },
+          "unit": "string"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 14 },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value",
+        "text": { "titleSize": 14, "valueSize": 28 }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dms\")\n  |> filter(fn: (r) => r[\"_field\"] == \"keys\")\n  |> last()\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DMS – trenutno pritisnute tipke",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [{ "options": { "0": { "color": "green", "index": 0, "text": "Otvoreno" } }, "type": "value" }, { "options": { "1": { "color": "red", "index": 0, "text": "Pritisnuto" } }, "type": "value" }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "id": 5,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"ds\")\n  |> filter(fn: (r) => r[\"_field\"] == \"pressed\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "A"
+        }
+      ],
+      "title": "DS – dugme vrata (pritisnuto/otvoreno)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "lineInterpolation": "stepAfter" },
+          "mappings": [
+            { "options": { "0": { "color": "gray", "index": 0, "text": "OFF" } }, "type": "value" },
+            { "options": { "1": { "color": "green", "index": 0, "text": "ON" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "gray", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "id": 6,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"actuator\")\n  |> filter(fn: (r) => r[\"actuator\"] == \"buzzer\")\n  |> filter(fn: (r) => r[\"_field\"] == \"state_num\")\n  |> yield(name: \"state_num\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Aktuator – Buzzer",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": { "lineInterpolation": "stepAfter" },
+          "mappings": [
+            { "options": { "0": { "color": "gray", "index": 0, "text": "OFF" } }, "type": "value" },
+            { "options": { "1": { "color": "green", "index": 0, "text": "ON" } }, "type": "value" }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "gray", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "id": 8,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "${datasource}" },
+          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"actuator\")\n  |> filter(fn: (r) => r[\"actuator\"] == \"light\")\n  |> filter(fn: (r) => r[\"_field\"] == \"state_num\")\n  |> yield(name: \"state_num\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Aktuator – Svjetlo",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["kt2", "iot"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "iot", "value": "iot" },
+        "hide": 0,
+        "label": "Bucket",
+        "name": "bucket",
+        "options": [{ "selected": true, "text": "iot", "value": "iot" }],
+        "query": "iot",
+        "skipUrlSync": false,
+        "type": "constant"
+      },
+      {
+        "current": { "selected": true, "text": "InfluxDB", "value": "influxdb" },
+        "hide": 0,
+        "label": "Datasource",
+        "name": "datasource",
+        "options": [{ "selected": true, "text": "InfluxDB", "value": "influxdb" }],
+        "query": "influxdb",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "Europe/Belgrade",
+  "title": "KT2 IoT senzori i aktuatori",
+  "uid": "kt2-iot",
+  "version": 1,
+  "weekStart": ""
+}

@@ -1,0 +1,10 @@
+# Dashboard KT2 – učitava se iz kt2/dashboard.json (unutar kontejnera)
+apiVersion: 1
+providers:
+  - name: KT2
+    orgId: 1
+    folder: "KT2"
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards/kt2
+      foldersFromFilesStructure: false

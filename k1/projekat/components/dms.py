@@ -12,22 +12,50 @@ DEFAULT_KEYMAP = [
 ]
 
 
-def dms_callback(pressed_keys):
-    t = time.localtime()
-    print("=" * 20)
-    print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-    if pressed_keys:
-        print(f"Keys pressed: {', '.join(sorted(pressed_keys))}")
-    else:
-        print("Keys pressed: none")
+SENSOR_TYPE = "dms"
 
 
-def run_dms(settings, threads, stop_event):
+def _dms_callback(pressed_keys, print_cb, enqueue_reading, device_info,
+                  topic_prefix, topic_override, simulated):
+    if print_cb:
+        print_cb(pressed_keys)
+    if enqueue_reading is not None and device_info is not None:
+        keys_list = list(pressed_keys) if pressed_keys else []
+        enqueue_reading(
+            device_info=device_info,
+            sensor_type=SENSOR_TYPE,
+            value={"keys": keys_list, "keys_count": len(keys_list)},
+            simulated=simulated,
+            topic_prefix=topic_prefix,
+            sensor_topic_override=topic_override,
+        )
+
+
+def run_dms(settings, threads, stop_event, enqueue_reading=None, device_info=None,
+            topic_prefix=None, topic_override=None):
     delay = settings.get("delay", 0.2)
     keymap = settings.get("keymap", DEFAULT_KEYMAP)
     row_pins = settings.get("row_pins", settings.get("rows", [25, 8, 7, 1]))
     col_pins = settings.get("col_pins", settings.get("cols", [12, 16, 20, 21]))
     allow_multi = settings.get("allow_multi", True)
+    simulated = settings.get("simulated", False)
+    topic_override = topic_override or settings.get("mqtt_topic")
+
+    def dms_callback(pressed_keys):
+        _dms_callback(
+            pressed_keys,
+            lambda k: _print_dms(k),
+            enqueue_reading, device_info, topic_prefix, topic_override, simulated,
+        )
+
+    def _print_dms(pressed_keys):
+        t = time.localtime()
+        print("=" * 20)
+        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+        if pressed_keys:
+            print(f"Keys pressed: {', '.join(sorted(pressed_keys))}")
+        else:
+            print("Keys pressed: none")
 
     if settings["simulated"]:
         print("Starting keypad simulator")

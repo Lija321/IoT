@@ -1,0 +1,14 @@
+# InfluxDB datasource – uid "influxdb" da dashboard nađe datasource
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: influxdb
+    url: http://influxdb:8086
+    access: proxy
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: iot
+    secureJsonData:
+      token: kt2-influxdb-token
