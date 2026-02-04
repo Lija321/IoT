@@ -107,76 +107,12 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            { "options": { "0": { "color": "#808080", "index": 0, "text": "0 (nijedna)" } }, "type": "value" },
-            { "options": { "1": { "color": "#73BF69", "index": 0, "text": "1 tipka" } }, "type": "value" },
-            { "options": { "2": { "color": "#FADE2A", "index": 0, "text": "2 tipke" } }, "type": "value" },
-            { "options": { "3": { "color": "#F2495C", "index": 0, "text": "3 tipke" } }, "type": "value" },
-            { "options": { "4": { "color": "#5794F2", "index": 0, "text": "4+ tipki" } }, "type": "value" }
-          ],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "#808080", "value": null }, { "color": "#73BF69", "value": 1 }, { "color": "#FADE2A", "value": 2 }, { "color": "#F2495C", "value": 3 }, { "color": "#5794F2", "value": 4 }] }
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
-      "id": 7,
-      "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
-      "targets": [
-        {
-          "datasource": { "type": "influxdb", "uid": "${datasource}" },
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dms\")\n  |> filter(fn: (r) => r[\"_field\"] == \"keys_count\")\n  |> yield(name: \"keys_count\")",
-          "refId": "A"
-        }
-      ],
-      "title": "DMS – broj pritisnutih tipki (timeline)",
-      "type": "state-timeline"
-    },
-    {
-      "datasource": { "type": "influxdb", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            { "options": { "": { "color": "#808080", "index": 0, "text": "— nijedna" } }, "type": "value" },
-            { "options": { "null": { "color": "#808080", "index": 0, "text": "— nijedna" } }, "type": "value" }
-          ],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "text", "value": null }] },
-          "unit": "string"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 14 },
-      "id": 9,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "textMode": "value",
-        "text": { "titleSize": 14, "valueSize": 28 }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "influxdb", "uid": "${datasource}" },
-          "query": "from(bucket: \"${bucket}\")\n  |> range(start: v.timeRangeStart)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dms\")\n  |> filter(fn: (r) => r[\"_field\"] == \"keys\")\n  |> last()\n  |> yield(name: \"last\")",
-          "refId": "A"
-        }
-      ],
-      "title": "DMS – trenutno pritisnute tipke",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "influxdb", "uid": "${datasource}" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
           "mappings": [{ "options": { "0": { "color": "green", "index": 0, "text": "Otvoreno" } }, "type": "value" }, { "options": { "1": { "color": "red", "index": 0, "text": "Pritisnuto" } }, "type": "value" }],
           "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "id": 5,
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
       "targets": [
@@ -203,7 +139,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
       "id": 6,
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
       "targets": [
@@ -230,7 +166,7 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
       "id": 8,
       "options": { "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }, "tooltip": { "mode": "single" } },
       "targets": [
